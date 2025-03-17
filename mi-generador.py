@@ -10,6 +10,7 @@ def create_yaml_file(client_amount):
     clients = join_clients(client_amount)
     server = create_server()
     network = create_network()
+    volumes = create_volumes()
     content = f"""
 name: tp0
 services:
@@ -17,6 +18,8 @@ services:
   {clients}
 networks:
   {network}
+volumes:
+  {volumes}
 """
     return content
 
@@ -39,6 +42,8 @@ def create_client(id):
       - testing_net
     depends_on:
       - server\n
+    volumes:
+      - client_config:/client/config.yaml
     """ 
     return client
 
@@ -51,7 +56,10 @@ def create_server():
       - PYTHONUNBUFFERED=1
       - LOGGING_LEVEL=DEBUG
     networks:
-      - testing_net"""
+      - testing_net
+    volumes:
+      - server_config:/server/config.ini
+    """
     return server
 
 def create_network():
@@ -63,6 +71,10 @@ def create_network():
     """
     return network
 
+def create_volumes():
+    volumes = f"""client_config:
+    server_config:
+    """
 
 def main(file_name, client_amount):
     # logging.debug(f"client amount {client_amount} ")
