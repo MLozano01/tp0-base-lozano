@@ -65,7 +65,7 @@ def create_network():
 
 
 def main(file_name, client_amount):
-    logging.debug(f"client amount {client_amount} ")
+    # logging.debug(f"client amount {client_amount} ")
     docker_yaml_generator(file_name, client_amount)
 
 if __name__ == "__main__":
