@@ -75,6 +75,7 @@ def create_volumes():
     volumes = f"""client_config:
     server_config:
     """
+    return volumes
 
 def main(file_name, client_amount):
     # logging.debug(f"client amount {client_amount} ")
