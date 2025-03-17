@@ -42,8 +42,8 @@ def create_client(id):
       - testing_net
     depends_on:
       - server\n
-    volumes:
-      - ./client:/client/config.yaml:ro
+    # volumes:
+    #   - ./client:/client/config.yaml
     """ 
     return client
 
