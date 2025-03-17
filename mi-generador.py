@@ -43,7 +43,7 @@ def create_client(id):
     depends_on:
       - server\n
     volumes:
-      - ./client:/client/config.yaml
+      - ./client:/client/config.yaml:ro
     """ 
     return client
 

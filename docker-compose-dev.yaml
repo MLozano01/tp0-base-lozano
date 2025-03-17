@@ -97,6 +97,6 @@ networks:
         - subnet: 172.25.125.0/24
     
 volumes:
-  client_config:
+  # client_config:
     server_config:
     
