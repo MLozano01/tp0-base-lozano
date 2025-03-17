@@ -11,7 +11,7 @@ services:
     networks:
       - testing_net
     volumes:
-      - server_config:/server/config.ini
+      - ./server:/server/config.ini
     
   
   client1:

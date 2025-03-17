@@ -19,7 +19,7 @@ services:
 networks:
   {network}
 volumes:
-  {volumes}
+  # {volumes}
 """
     return content
 
