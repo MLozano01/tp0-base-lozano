@@ -58,7 +58,7 @@ def create_server():
     networks:
       - testing_net
     volumes:
-      - server_config:/server/config.ini
+      - ./server:/server/config.ini
     """
     return server
 
