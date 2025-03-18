@@ -9,7 +9,6 @@ def create_yaml_file(client_amount):
     clients = join_clients(client_amount)
     server = create_server()
     network = create_network()
-    volumes = create_volumes()
     content = f"""
 name: tp0
 services:
@@ -17,8 +16,6 @@ services:
   {clients}
 networks:
   {network}
-volumes:
-  {volumes}
 """
     return content
 
@@ -57,7 +54,7 @@ def create_server():
     networks:
       - testing_net
     volumes:
-      - server-config:/server
+      - ./server/config.ini:/config.ini
     """
     return server
 
@@ -69,12 +66,6 @@ def create_network():
         - subnet: 172.25.125.0/24
     """
     return network
-
-def create_volumes():
-    volumes = f"""
-  server-config:
-  """
-    return volumes
 
 def main(file_name, client_amount):
     docker_yaml_generator(file_name, client_amount)
