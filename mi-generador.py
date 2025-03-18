@@ -42,7 +42,7 @@ def create_client(id):
     depends_on:
       - server\n
     volumes:
-      - client-config:/build/client
+      - ./client/config.yaml:/config.yaml
     """ 
     return client
 
@@ -72,7 +72,6 @@ def create_network():
 
 def create_volumes():
     volumes = f"""
-  client-config:
   server-config:
   """
     return volumes
