@@ -40,8 +40,8 @@ def create_client(id):
       - testing_net
     depends_on:
       - server\n
-    # volumes:
-    #   - client-config:/client
+    volumes:
+      - client-config:/config
     """ 
     return client
 
