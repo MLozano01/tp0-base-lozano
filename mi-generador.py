@@ -9,6 +9,7 @@ def create_yaml_file(client_amount):
     clients = join_clients(client_amount)
     server = create_server()
     network = create_network()
+    volumes = create_volumes()
     content = f"""
 name: tp0
 services:
@@ -16,6 +17,8 @@ services:
   {clients}
 networks:
   {network}
+volumes:
+  {volumes}
 """
     return content
 
@@ -31,13 +34,14 @@ def create_client(id):
     container_name: client{id}
     image: client:latest
     entrypoint: /client
-    environment:
       - CLI_ID={id}
       - CLI_LOG_LEVEL=DEBUG
     networks:
       - testing_net
     depends_on:
       - server\n
+    # volumes:
+    #   - client-config:/client
     """ 
     return client
 
@@ -50,7 +54,10 @@ def create_server():
       - PYTHONUNBUFFERED=1
       - LOGGING_LEVEL=DEBUG
     networks:
-      - testing_net"""
+      - testing_net
+    volumes:
+      - server-config:/server
+    """
     return server
 
 def create_network():
@@ -62,9 +69,14 @@ def create_network():
     """
     return network
 
+def create_volumes():
+    volumes = f"""
+  client-config:
+  server-config:
+  """
+    return volumes
 
 def main(file_name, client_amount):
-    # logging.debug(f"client amount {client_amount} ")
     docker_yaml_generator(file_name, client_amount)
 
 if __name__ == "__main__":
