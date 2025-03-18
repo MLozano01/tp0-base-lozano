@@ -34,6 +34,7 @@ def create_client(id):
     container_name: client{id}
     image: client:latest
     entrypoint: /client
+    environment:
       - CLI_ID={id}
       - CLI_LOG_LEVEL=DEBUG
     networks:
@@ -41,7 +42,7 @@ def create_client(id):
     depends_on:
       - server\n
     volumes:
-      - client-config:/config
+      - client-config:/build
     """ 
     return client
 
@@ -49,7 +50,7 @@ def create_server():
     server = f"""server:
     container_name: server
     image: server:latest
-    entrypoint: python3 /main.py
+    entrypoint: python3 main.py
     environment:
       - PYTHONUNBUFFERED=1
       - LOGGING_LEVEL=DEBUG
