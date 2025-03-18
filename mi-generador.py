@@ -42,7 +42,7 @@ def create_client(id):
     depends_on:
       - server\n
     volumes:
-      - client-config:/build
+      - client-config:/build/client
     """ 
     return client
 
