@@ -1,14 +1,14 @@
 #!/bin/bash
 
-docker run -dit --network=tp0_testing_net --name=server_tester ubuntu sh
+docker run --network=tp0_testing_net --name=server_tester ubuntu sh
 
-docker exec -it server_tester sh -c "apt update && apt install -y  netcat-openbsd"
+docker exec server_tester sh -c "apt update && apt install -y  netcat-openbsd"
 
 TEST_MESSAGE="Malfoy"
 
 PORT="12345"
 
-SERVER_ANS=$(docker exec -it server_tester sh -c "echo $TEST_MESSAGE | nc server $PORT | tr -d '\r\n'")
+SERVER_ANS=$(docker exec server_tester sh -c "echo $TEST_MESSAGE | nc server $PORT | tr -d '\r\n'")
 
 # echo $SERVER_ANS
 
