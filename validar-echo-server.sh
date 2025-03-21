@@ -16,7 +16,7 @@ SERVER_ANS=$(docker exec -it server_tester sh -c "echo $TEST_MESSAGE | nc server
 # echo "Length of the string is : $n"
 
 
-if [[ "$SERVER_ANS" = "$TEST_MESSAGE" ]]
+if [ "$SERVER_ANS" = "$TEST_MESSAGE" ]
 then 
     echo "action: test_echo_server | result: success"
 else 
