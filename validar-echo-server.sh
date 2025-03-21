@@ -4,7 +4,7 @@ docker run -dit --network=tp0_testing_net --name=server_tester ubuntu sh
 
 docker exec -it server_tester sh -c "apt update && apt install -y  netcat-openbsd"
 
-TEST_MESSAGE="Potter"
+TEST_MESSAGE="Malfoy"
 
 PORT="12345"
 
