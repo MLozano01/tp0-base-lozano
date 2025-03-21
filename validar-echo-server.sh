@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker run -it --network=testing_net --name=my_tester ubuntu sh
+docker run -it --network=tp0_testing_net --name=my_tester ubuntu sh
 
 docker exec -it my_tester sh -c "apt update && apt install -y  netcat-traditional"
 
