@@ -22,6 +22,3 @@ then
 else 
     echo "action: test_echo_server | result: fail"
 fi
-
-docker stop server_tester
-docker rm server_tester
