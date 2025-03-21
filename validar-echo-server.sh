@@ -21,4 +21,7 @@ then
     echo "action: test_echo_server | result: success"
 else 
     echo "action: test_echo_server | result: fail"
-fi    
+fi
+
+docker stop server_tester
+docker rm server_tester
