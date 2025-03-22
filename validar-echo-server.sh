@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker run --network=tp0_testing_net --name=server_tester ubuntu sh
+docker run --network=tp0_testing_net --rm --name=server_tester ubuntu sh
 
 docker exec server_tester sh -c "apt update && apt install -y  netcat-openbsd"
 
