@@ -8,7 +8,7 @@ TEST_MESSAGE="Malfoy"
 
 PORT="12345"
 
-SERVER_ANS=$(docker exec server_tester sh -c "echo $TEST_MESSAGE | nc server $PORT | tr -d '\r\n'")
+SERVER_ANS=$(docker exec server_tester sh -c "echo $TEST_MESSAGE | nc -w 5 server $PORT | tr -d '\r\n'")
 
 # echo $SERVER_ANS
 
@@ -21,4 +21,4 @@ then
     echo "action: test_echo_server | result: success"
 else 
     echo "action: test_echo_server | result: fail"
-fi
+fi 
