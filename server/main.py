@@ -6,6 +6,7 @@ import logging
 import os
 
 import signal
+import sys
 
 
 def initialize_config():
@@ -38,7 +39,6 @@ def initialize_config():
 
 def main():
 
-    signal.signal(signal.SIGINT, server.close())
 
     config_params = initialize_config()
     logging_level = config_params["logging_level"]
@@ -54,6 +54,7 @@ def main():
 
     # Initialize server and start server loop
     server = Server(port, listen_backlog)
+    signal.signal(signal.SIGINT, exit_gracefully(server))
     server.run()
 
 def initialize_log(logging_level):
@@ -69,6 +70,9 @@ def initialize_log(logging_level):
         datefmt='%Y-%m-%d %H:%M:%S',
     )
 
+def exit_gracefully(server):
+    server.close()
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
