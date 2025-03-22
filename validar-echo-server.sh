@@ -14,11 +14,10 @@ SERVER_ANS=$(docker run --network=$NET --name=$C_NAME busybox sh -c "echo $TEST_
 
 # SERVER_ANS=$(docker exec server_tester sh -c "echo $TEST_MESSAGE | nc -w 5 server $PORT | tr -d '\r\n'")
 
-echo $SERVER_ANS
+# echo $SERVER_ANS
 
-n=$(expr length "$SERVER_ANS")
-echo "Length of the string is : $n"
-
+# n=$(expr length "$SERVER_ANS")
+# echo "Length of the string is : $n"
 
 if [ "$SERVER_ANS" = "$TEST_MESSAGE" ]
 then 
