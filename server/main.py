@@ -5,6 +5,8 @@ from common.server import Server
 import logging
 import os
 
+import signal
+
 
 def initialize_config():
     """ Parse env variables or config file to find program config params
@@ -35,6 +37,9 @@ def initialize_config():
 
 
 def main():
+
+    signal.signal(signal.SIGTERM, server.close)
+
     config_params = initialize_config()
     logging_level = config_params["logging_level"]
     port = config_params["port"]
