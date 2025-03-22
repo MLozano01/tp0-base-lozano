@@ -8,7 +8,7 @@ NET="tp0_testing_net"
 
 C_NAME="server_tester"
 
-SERVER_ANS=$(docker run --network=$NET --name=$C_NAME busybox sh -c "echo $TEST_MESSAGE | nc -w 5 server $PORT")
+SERVER_ANS=$(docker run --rm --network=$NET --name=$C_NAME busybox sh -c "echo $TEST_MESSAGE | nc -w 5 server $PORT")
 
 # docker exec server_tester sh -c "apt update && apt install -y  netcat-openbsd"
 
@@ -24,4 +24,4 @@ then
     echo "action: test_echo_server | result: success"
 else 
     echo "action: test_echo_server | result: fail"
-fi 
+fi
