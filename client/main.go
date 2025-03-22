@@ -118,9 +118,11 @@ func main() {
 
 	signal.Notify(signalC, os.Interrupt, syscall.SIGTERM)
 
-	<-signalC
-	Exit_Gracefully(client)
-
+	go func() {
+		<-signalC
+		Exit_Gracefully(client)
+	}()
+	
 	client.StartClientLoop()
 }
 
