@@ -56,3 +56,13 @@ class Server:
         c, addr = self._server_socket.accept()
         logging.info(f'action: accept_connections | result: success | ip: {addr[0]}')
         return c
+
+    def close(self):
+        """
+        Close server socket
+
+        Function that closes the server socket
+        """
+        self._server_socket.shutdown(socket.SHUT_RDWR)
+        self._server_socket.close()
+        logging.info("action: close_server_socket | result: success")
