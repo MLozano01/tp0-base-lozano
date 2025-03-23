@@ -54,7 +54,7 @@ def main():
 
     # Initialize server and start server loop
     server = Server(port, listen_backlog)
-    signal.signal(signal.SIGTERM, server.close())
+    signal.signal(signal.SIGTERM, exit_gracefully(server))
     server.run()
 
 def initialize_log(logging_level):
