@@ -1,6 +1,6 @@
 import socket
 import logging
-
+import signal
 
 class Server:
     def __init__(self, port, listen_backlog):
@@ -18,9 +18,14 @@ class Server:
         finishes, servers starts to accept new connections again
         """
 
+
+
         # TODO: Modify this program to handle signal to graceful shutdown
         # the server
         while True:
+
+            signal.signal(signal.SIGTERM, self.close)
+
             client_sock = self.__accept_new_connection()
             self.__handle_client_connection(client_sock)
 
@@ -66,3 +71,4 @@ class Server:
         self._server_socket.shutdown(socket.SHUT_RDWR)
         self._server_socket.close()
         logging.info("action: close_server_socket | result: success")
+

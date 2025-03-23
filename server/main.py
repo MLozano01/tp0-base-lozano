@@ -5,9 +5,6 @@ from common.server import Server
 import logging
 import os
 
-import signal
-import sys
-
 
 def initialize_config():
     """ Parse env variables or config file to find program config params
@@ -54,7 +51,8 @@ def main():
 
     # Initialize server and start server loop
     server = Server(port, listen_backlog)
-    signal.signal(signal.SIGTERM, exit_gracefully(server))
+
+
     server.run()
 
 def initialize_log(logging_level):
@@ -69,10 +67,6 @@ def initialize_log(logging_level):
         level=logging_level,
         datefmt='%Y-%m-%d %H:%M:%S',
     )
-
-def exit_gracefully(server):
-    server.close()
-    sys.exit(0)
 
 if __name__ == "__main__":
     main()
