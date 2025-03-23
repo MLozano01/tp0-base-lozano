@@ -1,20 +1,14 @@
 #!/bin/bash
 
-docker run -dit --network=tp0_testing_net --name=server_tester ubuntu sh
-
-docker exec -it server_tester sh -c "apt update && apt install -y  netcat-traditional"
-
 TEST_MESSAGE="Malfoy"
 
 PORT="12345"
 
-SERVER_ANS=$(docker exec -it server_tester sh -c "echo $TEST_MESSAGE | nc server $PORT | tr -d '\r\n'")
+NET="tp0_testing_net"
 
-# echo $SERVER_ANS
+C_NAME="server_tester"
 
-# n=$(expr length "$SERVER_ANS")
-# echo "Length of the string is : $n"
-
+SERVER_ANS=$(docker run --rm --network=$NET --name=$C_NAME busybox sh -c "echo $TEST_MESSAGE | nc -w 5 server $PORT")
 
 if [ "$SERVER_ANS" = "$TEST_MESSAGE" ]
 then 
@@ -22,6 +16,3 @@ then
 else 
     echo "action: test_echo_server | result: fail"
 fi
-
-docker stop server_tester
-docker rm server_tester

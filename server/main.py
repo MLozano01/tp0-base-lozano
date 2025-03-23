@@ -36,7 +36,6 @@ def initialize_config():
 
 def main():
 
-
     config_params = initialize_config()
     logging_level = config_params["logging_level"]
     port = config_params["port"]
@@ -51,8 +50,6 @@ def main():
 
     # Initialize server and start server loop
     server = Server(port, listen_backlog)
-
-
     server.run()
 
 def initialize_log(logging_level):
