@@ -33,6 +33,11 @@ def create_client(id):
     entrypoint: /client
     environment:
       - CLI_ID={id}
+      - NOMBRE= Harry
+      - APELLIDO= Potter
+      - DOCUMENTO= 1234567{id}
+      - NACIMIENTO= 1980-07-31
+      - NUMERO= 3731
     networks:
       - testing_net
     depends_on:
