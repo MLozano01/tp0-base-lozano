@@ -19,6 +19,11 @@ services:
     entrypoint: /client
     environment:
       - CLI_ID=1
+      - NAME= Harry
+      - SURNAME= Potter
+      - DOCUMENT= 12345671
+      - BIRTHDATE= 1980-07-31
+      - NUMBER= 3731
     networks:
       - testing_net
     depends_on:

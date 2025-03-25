@@ -2,6 +2,9 @@ import socket
 import logging
 import signal
 
+from common.server_protocol import decode_bet
+import common.utils as utils
+
 class Server:
     def __init__(self, port, listen_backlog):
         # Initialize server socket
@@ -40,11 +43,24 @@ class Server:
         """
         try:
             # TODO: Modify the receive to avoid short-reads
-            msg = client_sock.recv(1024).rstrip().decode('utf-8')
-            addr = client_sock.getpeername()
-            logging.info(f'action: receive_message | result: success | ip: {addr[0]} | msg: {msg}')
+            
+            data = self.rcvall(client_sock)
+
+            name, surname, id_, birthdate, number = decode_bet(data)
+
+            bet = utils.Bet(name, surname, id_, birthdate, number)
+
+            utils.store_bets(bet)
+
+            logging.info(f"action: receive_message | result: success | dni: ${bet.document} | numero: ${bet.number}")
+
+            # addr = client_sock.getpeername()
+            # logging.info(f'action: receive_message | result: success | ip: {addr[0]} | msg: {msg}')
             # TODO: Modify the send to avoid short-writes
-            client_sock.send("{}\n".format(msg).encode('utf-8'))
+            # client_sock.send("{}\n".format(msg).encode('utf-8'))
+
+            client_sock.sendall("ACK\n".encode('utf-8'))
+
         except OSError as e:
             logging.error("action: receive_message | result: fail | error: {e}")
         finally:
@@ -77,3 +93,11 @@ class Server:
 
     def hanlder(self, signum, frame):
         self.close_server_socket()
+
+    def rcvall(self, sock):
+        buff_size = sock.recv(4)
+        data = b''
+        while data < buff_size:
+            part = sock.recv(buff_size)
+            data += part
+        return data
