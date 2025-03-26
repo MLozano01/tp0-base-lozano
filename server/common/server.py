@@ -56,7 +56,7 @@ class Server:
 
             utils.store_bets(bets)
 
-            logging.info(f"action: receive_message | result: success | dni: {bet.document} | numero: {bet.number}")
+            logging.info(f"action: apuesta_almacenada | result: success | dni: {bet.document} | numero: {bet.number}")
 
             # addr = client_sock.getpeername()
             # logging.info(f'action: receive_message | result: success | ip: {addr[0]} | msg: {msg}')
