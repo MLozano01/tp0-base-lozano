@@ -30,6 +30,7 @@ class Server:
             try:
                 client_sock = self.__accept_new_connection()
                 self.__handle_client_connection(client_sock)
+                break
             except Exception as e:
                 logging.error(f"action: run | result: fail | error: {e}")
                 break
