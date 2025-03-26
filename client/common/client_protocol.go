@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	NAME_CODE = 01
-	SURNAME_CODE = 02
-	ID_CODE = 03
-	BIRTHDATE_CODE = 04
-	NUMBER_CODE = 05
+	NAME_CODE = 1
+	SURNAME_CODE = 2
+	ID_CODE = 3
+	BIRTHDATE_CODE = 4
+	NUMBER_CODE = 5
 )
 
 // Protocol 
@@ -44,9 +44,11 @@ func EncodeBet(bet Bet) []byte {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
 	}
 
-	final_bets.WriteTo(buf)
+	bufferBytes := buf.Bytes()
 
-	return buf.Bytes()
+	final_bets.Write(bufferBytes)
+
+	return final_bets.Bytes()
 }
 
 func writeString(buf *bytes.Buffer, s string, code int) {

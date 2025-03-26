@@ -1,3 +1,4 @@
+import logging
 
 NAME_CODE = 1
 SURNAME_CODE = 2
@@ -18,42 +19,39 @@ INT32_LEN = 4
 def decode_bet(bet_info):
     total_bytes_rcv = 0
 
-    total_bytes_sent = bet_info[:INT32_LEN]
     total_bytes_rcv += INT32_LEN
 
     while total_bytes_rcv != len(bet_info):
 
-        code = int.from_bytes(bet_info[total_bytes_rcv:INT32_LEN], byteorder='big')
+        code = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
         total_bytes_rcv += INT32_LEN
 
         if code == NAME_CODE:
-            name_len = int.from_bytes(bet_info[total_bytes_rcv:INT32_LEN], byteorder='big')
+            name_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
             total_bytes_rcv += INT32_LEN
-            name = bet_info[total_bytes_rcv:name_len].decode('utf-8')
+            name = bet_info[total_bytes_rcv:total_bytes_rcv+name_len].decode('utf-8')
             total_bytes_rcv += name_len
 
         elif code == SURNAME_CODE:
-            surname_len = int.from_bytes(bet_info[total_bytes_rcv:INT32_LEN], byteorder='big') 
+            surname_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
             total_bytes_rcv += INT32_LEN
-            surname = bet_info[total_bytes_rcv:surname_len].decode('utf-8')
+            surname = bet_info[total_bytes_rcv:total_bytes_rcv+surname_len].decode('utf-8')
             total_bytes_rcv += surname_len
 
         elif code == ID_CODE:
-            document_len = int.from_bytes(bet_info[total_bytes_rcv:INT32_LEN], byteorder='big') 
+            document_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
             total_bytes_rcv += INT32_LEN
-            document = bet_info[total_bytes_rcv:document_len].decode('utf-8')
+            document = bet_info[total_bytes_rcv:total_bytes_rcv+document_len].decode('utf-8')
             total_bytes_rcv += document_len
 
         elif code == BIRTHDATE_CODE:
-            birthdate_len = int.from_bytes(bet_info[total_bytes_rcv:INT32_LEN], byteorder='big') 
+            birthdate_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
             total_bytes_rcv += INT32_LEN
-            birthdate = bet_info[total_bytes_rcv:birthdate_len].decode('utf-8')
+            birthdate = bet_info[total_bytes_rcv:total_bytes_rcv+birthdate_len].decode('utf-8')
             total_bytes_rcv += birthdate_len
 
         elif code == NUMBER_CODE:
-            number = int.from_bytes(bet_info[total_bytes_rcv:INT32_LEN], byteorder='big')
+            number = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
             total_bytes_rcv += INT32_LEN
 
     return name, surname, document, birthdate, number
-
-

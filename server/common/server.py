@@ -48,11 +48,13 @@ class Server:
 
             name, surname, id_, birthdate, number = decode_bet(data)
 
-            bet = utils.Bet(name, surname, id_, birthdate, number)
+            bet = utils.Bet(1, name, surname, id_, birthdate, number)
 
-            utils.store_bets(bet)
+            bets = [bet]
 
-            logging.info(f"action: receive_message | result: success | dni: ${bet.document} | numero: ${bet.number}")
+            utils.store_bets(bets)
+
+            logging.info(f"action: receive_message | result: success | dni: {bet.document} | numero: {bet.number}")
 
             # addr = client_sock.getpeername()
             # logging.info(f'action: receive_message | result: success | ip: {addr[0]} | msg: {msg}')
@@ -95,9 +97,15 @@ class Server:
         self.close_server_socket()
 
     def rcvall(self, sock):
-        buff_size = sock.recv(4)
-        data = b''
-        while data < buff_size:
-            part = sock.recv(buff_size)
-            data += part
-        return data
+        expected_size = sock.recv(4)
+        expected_size_int = int.from_bytes(expected_size, byteorder='big')
+        data = bytearray()
+
+        while len(data) < expected_size_int:
+            part = sock.recv(32)
+            data.extend(part)
+
+        final_data = bytearray()
+        final_data.extend(expected_size)
+        final_data.extend(data)
+        return final_data
