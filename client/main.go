@@ -124,6 +124,7 @@ func main() {
 	}()
 	
 	client.StartClientLoop()
+	
 }
 
 func Exit_Gracefully(client *common.Client) {
