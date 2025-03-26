@@ -2,7 +2,7 @@ import socket
 import logging
 import signal
 
-from common.server_protocol import decode_bet
+from common.server_protocol import decode_bets
 import common.utils as utils
 
 class Server:
@@ -48,20 +48,17 @@ class Server:
             
             data = self.rcvall(client_sock)
 
-            name, surname, id_, birthdate, number = decode_bet(data)
+            bets, all_good = decode_bets(data)
 
-            bet = utils.Bet(1, name, surname, id_, birthdate, number)
 
-            bets = [bet]
+            if not all_good:
+                logging.error(f"action: receive_message | result: fail | cantidad: {len(bets)}")
+                client_sock.sendall("ERROR\n".encode('utf-8'))
+                return
 
             utils.store_bets(bets)
 
-            logging.info(f"action: apuesta_almacenada | result: success | dni: {bet.document} | numero: {bet.number}")
-
-            # addr = client_sock.getpeername()
-            # logging.info(f'action: receive_message | result: success | ip: {addr[0]} | msg: {msg}')
-            # TODO: Modify the send to avoid short-writes
-            # client_sock.send("{}\n".format(msg).encode('utf-8'))
+            logging.info(f"action: apuesta_almacenada | result: success | cantidad: {len(bets)}")
 
             client_sock.sendall("ACK\n".encode('utf-8'))
 

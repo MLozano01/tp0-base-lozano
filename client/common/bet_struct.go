@@ -5,5 +5,5 @@ type Bet struct {
 	Surname string
 	Id string
 	Birthdate string
-	Number int32
+	Number string
 }

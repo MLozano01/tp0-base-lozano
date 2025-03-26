@@ -33,17 +33,13 @@ def create_client(id):
     entrypoint: /client
     environment:
       - CLI_ID={id}
-      - NAME=Harry
-      - SURNAME=Potter
-      - DOCUMENT=1234567{id}
-      - BIRTHDATE=1980-07-31
-      - NUMBER=3731
     networks:
       - testing_net
     depends_on:
       - server\n
     volumes:
       - ./client/config.yaml:/config.yaml
+      - ././data/dataset/agency-{id}.csv:/agency-{id}.csv
     """ 
     return client
 

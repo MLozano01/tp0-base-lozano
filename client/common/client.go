@@ -2,14 +2,18 @@ package common
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"os"
 	"time"
 
 	"strconv"
+	"strings"
 
 	"github.com/op/go-logging"
 )
+
+const MAX_MESSAGE_SIZE = 8192
 
 var log = logging.MustGetLogger("log")
 
@@ -19,6 +23,7 @@ type ClientConfig struct {
 	ServerAddress string
 	LoopAmount    int
 	LoopPeriod    time.Duration
+	BatchMaxAmount int
 }
 
 // Client Entity that encapsulates how
@@ -57,23 +62,78 @@ func (c *Client) StartClientLoop() {
 	// There is an autoincremental msgID to identify every message sent
 	// Messages if the message amount threshold has not been surpassed
 
-	number, _ := strconv.Atoi(os.Getenv("NUMBER"))
-
-	bet := Bet{Name: os.Getenv("NAME"), Surname: os.Getenv("SURNAME"), Id: os.Getenv("DOCUMENT"), Birthdate: os.Getenv("BIRTHDATE"), Number: int32(number)}
-
-	encodedBet := EncodeBet(bet)
-
-	log.Info("bet len ", len(encodedBet))
-
-	// Create the connection the server in every loop iteration. Send an
 	c.createClientSocket()
 
-	// TODO: Modify the send to avoid short-write
+	id, _ := strconv.Atoi(c.config.ID)
+	file := fmt.Sprintf("agency-%d.csv", id)
 
-	c.sendAll(encodedBet)
+	f, err := os.Open(file)
 
+	if err != nil {
+		log.Criticalf("action: open_file | result: fail | client_id: %v | error: %v", c.config.ID, err)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+
+	bets_raw := []byte{}
+
+	batchNum := 0
+
+	for scanner.Scan() {
+
+		line := scanner.Text()
+
+		bet_arr := strings.Split(line, ",")
+
+		bet := Bet{
+			Name:      bet_arr[0],
+			Surname:   bet_arr[1],
+			Id:        bet_arr[2],
+			Birthdate: bet_arr[3],
+			Number:    bet_arr[4],
+		}
+
+		encodedBet := EncodeBet(bet)
+
+		if len(bets_raw) + len(encodedBet) < MAX_MESSAGE_SIZE {
+			bets_raw = append(bets_raw, encodedBet...)
+		}
+
+		batchNum++
+
+		if batchNum == c.config.BatchMaxAmount {
+			c.sendAll(FinalizeBet(bets_raw, int32(id)))
+			c.getServerResponse()
+			batchNum = 0
+			bets_raw = []byte{}
+		}
+
+		time.Sleep(c.config.LoopPeriod)	
+	}
+
+	if len(bets_raw) > 0 {
+		c.sendAll(FinalizeBet(bets_raw, int32(id)))
+	}
+
+	c.Close()
+	log.Infof("action: loop_finished | result: success | client_id: %v", c.config.ID)
+}
+
+func (c *Client) sendAll(data []byte) {
+	sentData := 0
+
+	for sentData < len(data) {
+		nSent, err := c.conn.Write(data[sentData:])
+		if err != nil {
+			log.Criticalf("action: send_all | result: fail | client_id: %v | error: %v", c.config.ID, err)
+		}
+		sentData += nSent
+	}
+}
+
+func (c *Client) getServerResponse() {
 	msg, err := bufio.NewReader(c.conn).ReadString('\n')
-	c.conn.Close()
 
 	if err != nil {
 		log.Errorf("action: receive_message | result: fail | client_id: %v | error: %v",
@@ -89,28 +149,6 @@ func (c *Client) StartClientLoop() {
 			msg,
 		)
 		return
-	}
-
-	log.Infof("action: apuesta_enviada | result: success | dni: %v | numero: %v",
-		bet.Id,
-		bet.Number,
-	)
-
-	// Wait a time between sending one message and the next one
-	time.Sleep(c.config.LoopPeriod)	
-	c.Close()
-	log.Infof("action: loop_finished | result: success | client_id: %v", c.config.ID)
-}
-
-func (c *Client) sendAll(data []byte) {
-	sentData := 0
-
-	for sentData < len(data) {
-		nSent, err := c.conn.Write(data[sentData:])
-		if err != nil {
-			log.Criticalf("action: send_all | result: fail | client_id: %v | error: %v", c.config.ID, err)
-		}
-		sentData += nSent
 	}
 }
 
