@@ -65,41 +65,39 @@ func (c *Client) StartClientLoop() {
 
 	log.Info("bet len ", len(encodedBet))
 
-	for msgID := 1; msgID <= c.config.LoopAmount; msgID++ {
-		// Create the connection the server in every loop iteration. Send an
-		c.createClientSocket()
+	// Create the connection the server in every loop iteration. Send an
+	c.createClientSocket()
 
-		// TODO: Modify the send to avoid short-write
+	// TODO: Modify the send to avoid short-write
 
-		c.sendAll(encodedBet)
+	c.sendAll(encodedBet)
 
-		msg, err := bufio.NewReader(c.conn).ReadString('\n')
-		c.conn.Close()
+	msg, err := bufio.NewReader(c.conn).ReadString('\n')
+	c.conn.Close()
 
-		if err != nil {
-			log.Errorf("action: receive_message | result: fail | client_id: %v | error: %v",
-				c.config.ID,
-				err,
-			)
-			return
-		}
-
-		if msg != "ACK\n" {
-			log.Errorf("action: receive_message | result: fail | client_id: %v | msg: %v",
-				c.config.ID,
-				msg,
-			)
-			return
-		}
-
-		log.Infof("action: apuesta_enviada | result: success | dni: %v | numero: %v",
-			bet.Id,
-			bet.Number,
+	if err != nil {
+		log.Errorf("action: receive_message | result: fail | client_id: %v | error: %v",
+			c.config.ID,
+			err,
 		)
-
-		// Wait a time between sending one message and the next one
-		time.Sleep(c.config.LoopPeriod)	
+		return
 	}
+
+	if msg != "ACK\n" {
+		log.Errorf("action: receive_message | result: fail | client_id: %v | msg: %v",
+			c.config.ID,
+			msg,
+		)
+		return
+	}
+
+	log.Infof("action: apuesta_enviada | result: success | dni: %v | numero: %v",
+		bet.Id,
+		bet.Number,
+	)
+
+	// Wait a time between sending one message and the next one
+	time.Sleep(c.config.LoopPeriod)	
 	c.Close()
 	log.Infof("action: loop_finished | result: success | client_id: %v", c.config.ID)
 }
