@@ -127,14 +127,14 @@ class Server:
         winners = {}
         for bet in all_bets:
             if utils.has_won(bet):
-                logging.info("THERE IS A WINNER")
+                # logging.info("THERE IS A WINNER")
                 winners[bet.agency] = winners.get(bet.agency, [])
                 winners[bet.agency].append(bet)
         
         for agency in range(0, len(self.client_list)):
-            logging.info(f"action: winners_sent | result: in_progress")
+            # logging.info(f"action: winners_sent | result: in_progress")
             
-            logging.info(f"{winners.get(agency+1, [])}")
+            # logging.info(f"{winners.get(agency+1, [])}")
 
             msg = protocol.encode_winners(winners.get(agency+1, []))
             self.client_list[agency].sendall(msg.encode('utf-8'))

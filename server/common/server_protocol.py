@@ -34,21 +34,21 @@ def parse_data(data):
     total_bytes_rcv += INT8_LEN
 
     if action == BET:
-        logging.info(f"action: parse_data | result: success | message: BET")
+        # logging.info(f"action: parse_data | result: success | message: BET")
         all_good = decode_bets(data[total_bytes_rcv:])
         return action, all_good, 0
     
     elif action == CLOSED:
-        logging.info(f"action: parse_data | result: success | message: CLOSED")
+        # logging.info(f"action: parse_data | result: success | message: CLOSED")
         return action, True, 0
 
     elif action == INFO:
-        logging.info(f"action: parse_data | result: success | message: INFO")
+        # logging.info(f"action: parse_data | result: success | message: INFO")
         info = decode_info(data[total_bytes_rcv:])
         return action, True, info
     
     elif action == DONE:
-        logging.info(f"action: parse_data | result: success | message: DONE")
+        # logging.info(f"action: parse_data | result: success | message: DONE")
         return action, True, 0
 
     logging.error(f"action: parse_data | result: fail | error: action")
@@ -132,7 +132,7 @@ def decode_info(data):
     return info
 
 def encode_winners(winners):
-    
+
     if len(winners) == 0:
         return "NO_WINNERS\n"
 
@@ -145,7 +145,7 @@ def encode_winners(winners):
 
     winners_msg += "\n"
 
-    logging.info(f"action: encode_winners | result: success | winners: {winners_msg}")
+    # logging.info(f"action: encode_winners | result: success | winners: {winners_msg}")
 
     return winners_msg
 
