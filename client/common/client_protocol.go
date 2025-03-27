@@ -24,13 +24,14 @@ const(
 
 // Protocol 
 // 0. Total length (int32)
-// 0. Agency (int32)
-// 1. NAME_CODE (int32) | length (int32) | name (string)
-// 2. SURNAME_CODE (int32) | length (int32) | surname (string)
-// 3. ID_CODE (int32) | length (int32) | surname (string)
-// 4. BIRTHDATE_CODE (int32) | length (int32) | birthdate (string)
-// 5. NUMBER_CODE (int32) | number (int32)
-// 6. End of Bet (int32)
+// 0. Content (int8)
+// 0. Agency (int8)
+// 1. NAME_CODE (int8) | length (int16) | name (string)
+// 2. SURNAME_CODE (int8) | length (int16) | surname (string)
+// 3. ID_CODE (int8) | length (int16) | surname (string)
+// 4. BIRTHDATE_CODE (int8) | length (int16) | birthdate (string)
+// 5. NUMBER_CODE (int8) | length (int16) | number (string)
+// 6. End of Bet (ini8)
 
 func EncodeBet(bet Bet) []byte {
 
@@ -109,7 +110,7 @@ func writeString(buf *bytes.Buffer, s string, code int) {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
 	}
 
-	err = binary.Write(buf, binary.BigEndian, int32(len(s)))
+	err = binary.Write(buf, binary.BigEndian, int16(len(s)))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)

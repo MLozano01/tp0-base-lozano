@@ -13,6 +13,7 @@ BET = 1
 CLOSED = 2
 
 INT32_LEN = 4
+INT16_LEN = 2
 INT8_LEN = 1
 
 # Protocol 
@@ -55,34 +56,19 @@ def decode_bets(bet_info):
         total_bytes_rcv += INT8_LEN
 
         if code == NAME_CODE:
-            name_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-            total_bytes_rcv += INT32_LEN
-            name = bet_info[total_bytes_rcv:total_bytes_rcv+name_len].decode('utf-8')
-            total_bytes_rcv += name_len
+            name, total_bytes_rcv = decode_str(bet_info, total_bytes_rcv)
 
         elif code == SURNAME_CODE:
-            surname_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-            total_bytes_rcv += INT32_LEN
-            surname = bet_info[total_bytes_rcv:total_bytes_rcv+surname_len].decode('utf-8')
-            total_bytes_rcv += surname_len
+            surname, total_bytes_rcv = decode_str(bet_info, total_bytes_rcv)
 
         elif code == ID_CODE:
-            document_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-            total_bytes_rcv += INT32_LEN
-            document = bet_info[total_bytes_rcv:total_bytes_rcv+document_len].decode('utf-8')
-            total_bytes_rcv += document_len
+            document, total_bytes_rcv = decode_str(bet_info, total_bytes_rcv)
 
         elif code == BIRTHDATE_CODE:
-            birthdate_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-            total_bytes_rcv += INT32_LEN
-            birthdate = bet_info[total_bytes_rcv:total_bytes_rcv+birthdate_len].decode('utf-8')
-            total_bytes_rcv += birthdate_len
+            birthdate, total_bytes_rcv = decode_str(bet_info, total_bytes_rcv)
 
         elif code == NUMBER_CODE:
-            number_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-            total_bytes_rcv += INT32_LEN
-            number = bet_info[total_bytes_rcv:total_bytes_rcv+number_len].decode('utf-8')
-            total_bytes_rcv += number_len
+            number, total_bytes_rcv = decode_str(bet_info, total_bytes_rcv)
         
         elif code == END_BET:
             bet = utils.Bet(agency, name, surname, document, birthdate, number)
@@ -93,6 +79,13 @@ def decode_bets(bet_info):
 
     return bets, all_good
 
+
+def decode_str(bet_info, total_bytes_rcv):
+    str_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT16_LEN], byteorder='big')
+    total_bytes_rcv += INT16_LEN
+    decoded_str = bet_info[total_bytes_rcv:total_bytes_rcv+str_len].decode('utf-8')
+    total_bytes_rcv += str_len
+    return decoded_str, total_bytes_rcv
 
 def check_bet(bet):
     all_good = True
