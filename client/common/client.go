@@ -127,7 +127,6 @@ func (c *Client) StartClientLoop() {
 
 	c.getServerResponse()
 
-
 	time.Sleep(time_to_wait)
 
 	c.Close()

@@ -28,9 +28,6 @@ class Server:
         finishes, servers starts to accept new connections again
         """
 
-        # TODO: Modify this program to handle signal to graceful shutdown
-        # the server
-
         signal.signal(signal.SIGTERM, self.hanlder)
 
         manager = mp.Manager()
@@ -55,7 +52,6 @@ class Server:
                 self.all_process.append(process)
 
             except Exception as e:
-                # logging.error("ES ACA")
                 # logging.error(f"action: run | result: fail | error: {e}")
                 break
 

@@ -15,6 +15,9 @@ CLOSED = 2
 INFO = 3
 DONE = 4
 
+WINNERS = "WINNERS"
+NO_WINNERS = "NO_WINNERS"
+
 INT32_LEN = 4
 INT16_LEN = 2
 INT8_LEN = 1
@@ -140,9 +143,9 @@ def decode_info(data):
 def encode_winners(winners):
 
     if len(winners) == 0:
-        return "NO_WINNERS\n"
+        return f"{NO_WINNERS}\n"
 
-    winners_msg = "WINNERS\n"
+    winners_msg = f"{WINNERS}\n"
 
     for winner in winners:
         winners_msg += f"{winner},"
@@ -150,8 +153,6 @@ def encode_winners(winners):
     winners_msg = winners_msg[:-1]
 
     winners_msg += "\n"
-
-    # logging.info(f"action: encode_winners | result: success | winners: {winners_msg}")
 
     return winners_msg
 
