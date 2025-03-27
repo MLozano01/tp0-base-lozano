@@ -70,10 +70,24 @@ Esta es una version mejorada del protocolo anterior, que acepta batch.
 5. NUMBER_CODE (int8) | length (int16) | number (string)
 6. End of Bet (int8)
 ```
+El servidor verifica que las apuestas cumplan el formaro enviado, y de estar todo correcto envia un `ACk` en caso contraario envia `ERROR`
 
+`Content` es un field que le indica al servidor con que tipo de mensaje esta tratando, si es una BET, un CLOSE, o INFO.
 
 ### Ej7
+
+El protocolo se mantiene igual por parte del cliente al servidor, ahora el servidor incluye dos tipos de respuestas nuevas"
+    `WINNERS\n[lista con los documentos ganadores]\n`
+    `NO_WINNERS\n`
+
+`Content` tambien puede ser DONE, lo cual el cliente envia cuando termina de enviar todas sus apuestas. El servidor utiliza esta informacion junto con el numero de agencias para determinar cuando todas finalizaron de enviar Bets, y puede proceder con el sorteo. Para este desarrollo, el cliente no cierra y vuelve a abrir su conexion, sino que espera un msg del server.
+
 ### Ej8
+
+Esta solucion se basa en el desarrollo del `ej7` pero en una version que permite un procesamiento en paralelo. 
+
+Busca que cada thread procese la comunicacion con un cliente diferente. Cuando el cliente indica que termino de enviar las bets, se le indica a un proceso en cargado de monitorear el estado de las apuestas, y cuando todos los threads le indican que ya guardaron todas las apuestas, realiza el sorteo para luego enviar los resultados como en el ej7.
+
 
 ## Instrucciones de uso
 El repositorio cuenta con un **Makefile** que incluye distintos comandos en forma de targets. Los targets se ejecutan mediante la invocación de:  **make \<target\>**. Los target imprescindibles para iniciar y detener el sistema son **docker-compose-up** y **docker-compose-down**, siendo los restantes targets de utilidad para el proceso de depuración.

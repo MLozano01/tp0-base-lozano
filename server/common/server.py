@@ -147,10 +147,6 @@ class Server:
                 winners[bet.agency].append(bet)
         
         for agency in range(0, len(self.client_list)):
-            # logging.info(f"action: winners_sent | result: in_progress")
-            
-            # logging.info(f"{winners.get(agency+1, [])}")
-
             msg = protocol.encode_winners(winners.get(agency+1, []))
             self.client_list[agency].sendall(msg.encode('utf-8'))
         
