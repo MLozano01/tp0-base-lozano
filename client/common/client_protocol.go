@@ -46,7 +46,7 @@ func EncodeBet(bet Bet) []byte {
 
 	writeString(buf, bet.Number, NUMBER_CODE)
 
-	err := binary.Write(buf, binary.BigEndian, int32(END_BET))
+	err := binary.Write(buf, binary.BigEndian, int8(END_BET))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
@@ -55,16 +55,16 @@ func EncodeBet(bet Bet) []byte {
 	return buf.Bytes()
 }
 
-func FinalizeBet(bets []byte, agency int32) []byte {
+func FinalizeBet(bets []byte, agency int8) []byte {
 	final_bets := new(bytes.Buffer)
 
-	err := binary.Write(final_bets, binary.BigEndian, int32(len(bets) + 8))
+	err := binary.Write(final_bets, binary.BigEndian, int32(len(bets) + 2))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
 	}
 
-	err =  binary.Write(final_bets, binary.BigEndian, int32(BET))
+	err =  binary.Write(final_bets, binary.BigEndian, int8(BET))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
@@ -86,13 +86,13 @@ func FinalizeBet(bets []byte, agency int32) []byte {
 func WriteConnectionClosed() []byte {
 	buf := new(bytes.Buffer)
 
-	err := binary.Write(buf, binary.BigEndian, int32(4))
+	err := binary.Write(buf, binary.BigEndian, int32(1))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
 	}
 
-	err = binary.Write(buf, binary.BigEndian, int32(CLOSED))
+	err = binary.Write(buf, binary.BigEndian, int8(CLOSED))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
@@ -103,7 +103,7 @@ func WriteConnectionClosed() []byte {
 
 func writeString(buf *bytes.Buffer, s string, code int) {
 
-	err := binary.Write(buf, binary.BigEndian, int32(code))
+	err := binary.Write(buf, binary.BigEndian, int8(code))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)

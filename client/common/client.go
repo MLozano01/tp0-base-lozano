@@ -102,7 +102,7 @@ func (c *Client) StartClientLoop() {
 		batchNum++
 
 		if batchNum == c.config.BatchMaxAmount {
-			c.sendAll(FinalizeBet(bets_raw, int32(id)))
+			c.sendAll(FinalizeBet(bets_raw, int8(id)))
 			c.getServerResponse()
 			batchNum = 0
 			bets_raw = []byte{}
@@ -112,7 +112,7 @@ func (c *Client) StartClientLoop() {
 	}
 
 	if len(bets_raw) > 0 {
-		c.sendAll(FinalizeBet(bets_raw, int32(id)))
+		c.sendAll(FinalizeBet(bets_raw, int8(id)))
 		time.Sleep(c.config.LoopPeriod)
 	}
 

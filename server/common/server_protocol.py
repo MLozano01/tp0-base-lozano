@@ -13,6 +13,7 @@ BET = 1
 CLOSED = 2
 
 INT32_LEN = 4
+INT8_LEN = 1
 
 # Protocol 
 # 0. Total length (int32)
@@ -26,8 +27,8 @@ def parse_data(data):
     total_bytes_rcv = 0
     total_bytes_rcv += INT32_LEN
 
-    action = int.from_bytes(data[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-    total_bytes_rcv += INT32_LEN
+    action = int.from_bytes(data[total_bytes_rcv:total_bytes_rcv+INT8_LEN], byteorder='big')
+    total_bytes_rcv += INT8_LEN
 
     if action == BET:
         logging.info(f"action: parse_data | result: success | message: BET")
@@ -45,13 +46,13 @@ def decode_bets(bet_info):
     bets = []
     all_good = True
 
-    agency = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-    total_bytes_rcv += INT32_LEN
+    agency = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT8_LEN], byteorder='big')
+    total_bytes_rcv += INT8_LEN
 
     while total_bytes_rcv != len(bet_info):
 
-        code = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
-        total_bytes_rcv += INT32_LEN
+        code = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT8_LEN], byteorder='big')
+        total_bytes_rcv += INT8_LEN
 
         if code == NAME_CODE:
             name_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
