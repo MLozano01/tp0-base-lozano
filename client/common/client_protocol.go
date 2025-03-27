@@ -13,6 +13,8 @@ const (
 	BIRTHDATE_CODE = 4
 	NUMBER_CODE = 5
 	END_BET = 6
+
+	CLOSED = "CLOSED\n"
 )
 
 // Protocol 
@@ -66,6 +68,26 @@ func FinalizeBet(bets []byte, agency int32) []byte {
 	final_bets.Write(bets)
 
 	return final_bets.Bytes()
+}
+
+func WriteConnectionClosed() []byte {
+	buf := new(bytes.Buffer)
+
+
+
+	err := binary.Write(buf, binary.BigEndian, int32(len(CLOSED)))
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
+	_, err = buf.WriteString(CLOSED)
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
+	return buf.Bytes()
 }
 
 func writeString(buf *bytes.Buffer, s string, code int) {

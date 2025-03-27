@@ -113,6 +113,7 @@ func (c *Client) StartClientLoop() {
 
 	if len(bets_raw) > 0 {
 		c.sendAll(FinalizeBet(bets_raw, int32(id)))
+		time.Sleep(c.config.LoopPeriod)
 	}
 
 	c.Close()
@@ -153,5 +154,6 @@ func (c *Client) getServerResponse() {
 
 func (c *Client) Close() {
 	log.Infof("action: close | result: success | client_id: %v", c.config.ID)
+	c.sendAll(WriteConnectionClosed())
 	c.conn.Close()
 }

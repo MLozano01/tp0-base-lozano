@@ -30,6 +30,8 @@ class Server:
             try:
                 client_sock = self.__accept_new_connection()
                 self.__handle_client_connection(client_sock)
+                self.close_server_socket()
+                break
             except Exception as e:
                 logging.error(f"action: run | result: fail | error: {e}")
                 break
@@ -41,26 +43,33 @@ class Server:
         If a problem arises in the communication with the client, the
         client socket will also be closed
         """
+        connection_opened = True
         try:            
-            data = self.rcvall(client_sock)
+            while connection_opened:
+                data = self.rcvall(client_sock)
+                connection_opened = self._check_connection_status(data)
+                if not connection_opened:
+                    logging.info("action: receive_message | result: success | message: CLOSED")
+                    break
 
-            bets, all_good = decode_bets(data)
+                bets, all_good = decode_bets(data)
 
+                if not all_good:
+                    logging.error(f"action: receive_message | result: fail | cantidad: {len(bets)}")
+                    client_sock.sendall("ERROR\n".encode('utf-8'))
+                    return
 
-            if not all_good:
-                logging.error(f"action: receive_message | result: fail | cantidad: {len(bets)}")
-                client_sock.sendall("ERROR\n".encode('utf-8'))
-                return
+                utils.store_bets(bets)
 
-            utils.store_bets(bets)
+                logging.info(f"action: apuesta_almacenada | result: success | cantidad: {len(bets)}")
 
-            logging.info(f"action: apuesta_almacenada | result: success | cantidad: {len(bets)}")
-
-            client_sock.sendall("ACK\n".encode('utf-8'))
+                client_sock.sendall("ACK\n".encode('utf-8'))
 
         except OSError as e:
             logging.error("action: receive_message | result: fail | error: {e}")
 
+        finally:
+            client_sock.close()
 
     def __accept_new_connection(self):
         """
@@ -87,7 +96,7 @@ class Server:
         logging.info("action: close_server_socket | result: success")
         print("Server closed")
 
-    def hanlder(self, signum, frame):
+    def hanlder(self):
         self.close_server_socket()
 
     def rcvall(self, sock):
@@ -96,10 +105,20 @@ class Server:
         data = bytearray()
 
         while len(data) < expected_size_int:
-            part = sock.recv(32)
+            part = sock.recv(1024)
             data.extend(part)
 
         final_data = bytearray()
         final_data.extend(expected_size)
         final_data.extend(data)
         return final_data
+    
+    def _check_connection_status(self, data):
+        """
+        Check if the server is running
+
+        Function that checks if the server is running
+        """
+        if data[4:] == b'CLOSED\n':
+            return False
+        return True
