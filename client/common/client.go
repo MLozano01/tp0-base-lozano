@@ -2,7 +2,6 @@ package common
 
 import (
 	"bufio"
-	"fmt"
 	"net"
 	"os"
 	"time"
@@ -65,23 +64,23 @@ func (c *Client) StartClientLoop() {
 	c.createClientSocket()
 
 	id, _ := strconv.Atoi(c.config.ID)
-	file := fmt.Sprintf("agency-%d.csv", id)
+	// file := fmt.Sprintf("./agency-%d.csv", id)
 
-	f, err := os.Open(file)
+	f, err := os.Open("./agency.csv")
 
 	if err != nil {
 		log.Criticalf("action: open_file | result: fail | client_id: %v | error: %v", c.config.ID, err)
 	}
+
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
 
 	bets_raw := []byte{}
-
 	batchNum := 0
 
-	for scanner.Scan() {
 
+	for scanner.Scan() {
 		line := scanner.Text()
 
 		bet_arr := strings.Split(line, ",")
@@ -153,5 +152,6 @@ func (c *Client) getServerResponse() {
 }
 
 func (c *Client) Close() {
+	log.Infof("action: close | result: success | client_id: %v", c.config.ID)
 	c.conn.Close()
 }

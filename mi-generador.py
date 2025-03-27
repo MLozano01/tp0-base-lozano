@@ -39,7 +39,7 @@ def create_client(id):
       - server\n
     volumes:
       - ./client/config.yaml:/config.yaml
-      - ././data/dataset/agency-{id}.csv:/agency-{id}.csv
+      - ./.data/agency-{id}.csv:/agency.csv
     """ 
     return client
 

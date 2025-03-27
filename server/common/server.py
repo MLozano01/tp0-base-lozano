@@ -30,8 +30,6 @@ class Server:
             try:
                 client_sock = self.__accept_new_connection()
                 self.__handle_client_connection(client_sock)
-                self.close_server_socket()
-                break
             except Exception as e:
                 logging.error(f"action: run | result: fail | error: {e}")
                 break
@@ -43,9 +41,7 @@ class Server:
         If a problem arises in the communication with the client, the
         client socket will also be closed
         """
-        try:
-            # TODO: Modify the receive to avoid short-reads
-            
+        try:            
             data = self.rcvall(client_sock)
 
             bets, all_good = decode_bets(data)
@@ -64,8 +60,7 @@ class Server:
 
         except OSError as e:
             logging.error("action: receive_message | result: fail | error: {e}")
-        finally:
-            client_sock.close()
+
 
     def __accept_new_connection(self):
         """

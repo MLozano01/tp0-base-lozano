@@ -80,10 +80,10 @@ def check_bet(bet):
     if bet.agency <= 0:
         logging.error(f"action: check_bet | result: fail | error: agency")
         all_good = False
-    if not bet.name:
+    if not bet.first_name:
         logging.error(f"action: check_bet | result: fail | error: name")
         all_good = False
-    if not bet.surname:
+    if not bet.last_name:
         logging.error(f"action: check_bet | result: fail | error: surname")
         all_good = False
     if not bet.document:
