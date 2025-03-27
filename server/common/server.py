@@ -47,7 +47,7 @@ class Server:
             while True:
                 data = self.rcvall(client_sock)
 
-                action, bets, all_good = decode_bets(data)
+                action, bets, all_good = parse_data(data)
                 
                 if action:
                     logging.info("action: receive_message | result: success | message: CLOSED")
