@@ -1,4 +1,5 @@
 import logging
+import os
 
 import common.utils as utils
 
@@ -26,7 +27,7 @@ INT8_LEN = 1
 # 4. BIRTHDATE_CODE (int32) | length (int32) | birthdate (string)
 # 5. NUMBER_CODE (int32) | number (int32)
 
-def parse_data(data):
+def parse_data(data, lock):
     total_bytes_rcv = 0
     total_bytes_rcv += INT32_LEN
 
@@ -35,7 +36,7 @@ def parse_data(data):
 
     if action == BET:
         # logging.info(f"action: parse_data | result: success | message: BET")
-        all_good = decode_bets(data[total_bytes_rcv:])
+        all_good = decode_bets(data[total_bytes_rcv:], lock)
         return action, all_good, 0
     
     elif action == CLOSED:
@@ -53,7 +54,7 @@ def parse_data(data):
 
     logging.error(f"action: parse_data | result: fail | error: action")
 
-def decode_bets(bet_info):
+def decode_bets(bet_info, lock):
     total_bytes_rcv = 0
     bets = []
     all_good = True
@@ -89,11 +90,16 @@ def decode_bets(bet_info):
                 return all_good
             bets.append(bet)
 
-    utils.store_bets(bets)
+    lock_store_bets(bets, lock)
     logging.info(f"action: apuesta_recibida | result: success | cantidad: {len(bets)}")
 
     return all_good
 
+
+def lock_store_bets(bets, lock):
+    with lock:
+        logging.info(f"action: lock_store_bets | result: success | cantidad: {len(bets)}| pid: {os.getpid()}")
+        utils.store_bets(bets)
 
 def decode_str(bet_info, total_bytes_rcv):
     str_len = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT16_LEN], byteorder='big')
