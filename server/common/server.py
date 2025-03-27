@@ -6,11 +6,14 @@ import common.server_protocol as protocol
 import common.utils as utils
 
 class Server:
-    def __init__(self, port, listen_backlog):
+    def __init__(self, port, listen_backlog, total_agency):
         # Initialize server socket
         self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._server_socket.bind(('', port))
         self._server_socket.listen(listen_backlog)
+        self.total_agency = total_agency
+        self.client_list = [None for i in range(total_agency)]
+        self.agencies_talked_to = 0
 
     def run(self):
         """
@@ -30,8 +33,13 @@ class Server:
             try:
                 client_sock = self.__accept_new_connection()
                 self.__handle_client_connection(client_sock)
-                self.close_server_socket()
-                break
+
+                if self.agencies_talked_to == self.total_agency:
+                    logging.info("action: sorteo | result: success")
+                    self.handle_contest()
+                    self.end()
+                    break
+
             except Exception as e:
                 logging.error(f"action: run | result: fail | error: {e}")
                 break
@@ -46,28 +54,31 @@ class Server:
         try:            
             while True:
                 data = self.rcvall(client_sock)
-                action, bets, all_good = protocol.parse_data(data)
+                action, all_good, info = protocol.parse_data(data)
                 
                 if action == protocol.CLOSED:
                     logging.info("action: receive_message | result: success | message: CLOSED")
                     break
 
+                if action == protocol.INFO:
+                    logging.info(f"action: receive_message | result: success | message: INFO | info: {info}")
+                    self.client_list[info-1] = client_sock
+                    client_sock.sendall("ACK\n".encode('utf-8'))
+                    continue
+
+                if action == protocol.DONE:
+                    logging.info("action: receive_message | result: success | message: DONE")
+                    self.agencies_talked_to += 1
+                    break
+
                 if not all_good:
-                    logging.error(f"action: receive_message | result: fail | cantidad: {len(bets)}")
                     client_sock.sendall("ERROR\n".encode('utf-8'))
                     return
-
-                utils.store_bets(bets)
-
-                logging.info(f"action: apuesta_recibida | result: success | cantidad: {len(bets)}")
 
                 client_sock.sendall("ACK\n".encode('utf-8'))
 
         except OSError as e:
             logging.error(f"action: receive_message | result: fail | error: {e}")
-
-        finally:
-            client_sock.close()
 
     def __accept_new_connection(self):
         """
@@ -102,8 +113,6 @@ class Server:
         expected_size_int = int.from_bytes(expected_size, byteorder='big')
         data = bytearray()
 
-        logging.info(f"action: receive_message | result: in_progress | expected_size: {expected_size_int}")
-
         while len(data) < expected_size_int:
             part = sock.recv(1024)
             data.extend(part)
@@ -113,12 +122,21 @@ class Server:
         final_data.extend(data)
         return final_data
     
-    def _check_connection_status(self, data):
-        """
-        Check if the server is running
+    def handle_contest(self):
+        all_bets = utils.load_bets()
+        winners = {}
+        for bet in all_bets:
+            if utils.has_won(bet):
+                winners[bet.agency] = winners.get(bet.agency, [])
+                winners[bet.agency].append(bet)
+        
+        for agency in self.client_list:
+            msg = protocol.encode_winners(winners.get(agency, []))
+            agency.sendall(msg.encode('utf-8'))
+        
+        logging.info("action: winners_sent | result: success")
 
-        Function that checks if the server is running
-        """
-        if data[4:] == b'CLOSED\n':
-            return False
-        return True
+    def end(self):
+        for client in self.client_list:
+            client.close()
+        self.close_server_socket()

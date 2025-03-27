@@ -7,7 +7,7 @@ def docker_yaml_generator(file_name, client_amount):
 
 def create_yaml_file(client_amount):
     clients = join_clients(client_amount)
-    server = create_server()
+    server = create_server(client_amount)
     network = create_network()
     content = f"""
 name: tp0
@@ -43,13 +43,14 @@ def create_client(id):
     """ 
     return client
 
-def create_server():
+def create_server(client_amount):
     server = f"""server:
     container_name: server
     image: server:latest
     entrypoint: python3 main.py
     environment:
       - PYTHONUNBUFFERED=1
+      - NUM_CLIENTS={client_amount}
     networks:
       - testing_net
     volumes:

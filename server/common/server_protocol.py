@@ -11,6 +11,8 @@ END_BET = 6
 
 BET = 1
 CLOSED = 2
+INFO = 3
+DONE = 4
 
 INT32_LEN = 4
 INT16_LEN = 2
@@ -33,12 +35,21 @@ def parse_data(data):
 
     if action == BET:
         logging.info(f"action: parse_data | result: success | message: BET")
-        bets, all_good = decode_bets(data[total_bytes_rcv:])
-        return action, bets, all_good
+        all_good = decode_bets(data[total_bytes_rcv:])
+        return action, all_good, 0
     
     elif action == CLOSED:
         logging.info(f"action: parse_data | result: success | message: CLOSED")
-        return action, [], True
+        return action, True, 0
+
+    elif action == INFO:
+        logging.info(f"action: parse_data | result: success | message: INFO")
+        info = decode_info(data[total_bytes_rcv:])
+        return action, True, info
+    
+    elif action == DONE:
+        logging.info(f"action: parse_data | result: success | message: DONE")
+        return action, True, 0
 
     logging.error(f"action: parse_data | result: fail | error: action")
 
@@ -74,10 +85,14 @@ def decode_bets(bet_info):
             bet = utils.Bet(agency, name, surname, document, birthdate, number)
             all_good = check_bet(bet)
             if not all_good:
-                return bets, all_good
+                logging.error(f"action: receive_message | result: fail | cantidad: {len(bets)}")
+                return all_good
             bets.append(bet)
 
-    return bets, all_good
+    utils.store_bets(bets)
+    logging.info(f"action: apuesta_recibida | result: success | cantidad: {len(bets)}")
+
+    return all_good
 
 
 def decode_str(bet_info, total_bytes_rcv):
@@ -109,3 +124,21 @@ def check_bet(bet):
         logging.error(f"action: check_bet | result: fail | error: number")
         all_good = False
     return all_good
+
+def decode_info(data):
+    total_bytes_rcv = 0
+
+    info = int.from_bytes(data[total_bytes_rcv:total_bytes_rcv+INT8_LEN], byteorder='big')
+    return info
+
+def encode_winners(winners):
+    winners_msg = "WINNERS\n"
+
+    for winner in winners:
+        winners_msg.join(f"{winner.document}\n", ",")
+
+    winners_msg.join("\n")
+
+    logging.info(f"action: encode_winners | result: success | winners: {winners_msg}")
+
+    return winners_msg

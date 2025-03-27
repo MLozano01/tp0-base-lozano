@@ -64,7 +64,9 @@ func (c *Client) StartClientLoop() {
 	c.createClientSocket()
 
 	id, _ := strconv.Atoi(c.config.ID)
-	// file := fmt.Sprintf("./agency-%d.csv", id)
+
+	c.sendAll(SendClientInfo(int8(id)))
+	c.getServerResponse()
 
 	f, err := os.Open("./agency.csv")
 
@@ -112,9 +114,23 @@ func (c *Client) StartClientLoop() {
 	}
 
 	if len(bets_raw) > 0 {
+		log.Info("Sending last batch")
 		c.sendAll(FinalizeBet(bets_raw, int8(id)))
+		c.getServerResponse()
 		time.Sleep(c.config.LoopPeriod)
 	}
+
+	log.Info("Sending done message")
+
+	c.sendAll(SendClientDone())
+
+	log.Info("Done message sent")
+
+	time_to_wait := time.Duration(1 * time.Second)
+
+	time.Sleep(time_to_wait)
+
+	c.getServerResponse()
 
 	c.Close()
 	log.Infof("action: loop_finished | result: success | client_id: %v", c.config.ID)
@@ -133,7 +149,9 @@ func (c *Client) sendAll(data []byte) {
 }
 
 func (c *Client) getServerResponse() {
-	msg, err := bufio.NewReader(c.conn).ReadString('\n')
+	reader := bufio.NewReader(c.conn)
+	msg, err := reader.ReadString('\n')
+
 
 	if err != nil {
 		log.Errorf("action: receive_message | result: fail | client_id: %v | error: %v",
@@ -143,13 +161,37 @@ func (c *Client) getServerResponse() {
 		return
 	}
 
-	if msg != "ACK\n" {
+	log.Infof("action: receive_message | result: success | client_id: %v | msg: %v",
+		c.config.ID,
+		msg,
+	)
+
+	if msg == ERROR {
 		log.Errorf("action: receive_message | result: fail | client_id: %v | msg: %v",
 			c.config.ID,
 			msg,
 		)
 		return
 	}
+
+	if msg == WINNER {
+		msg, err = reader.ReadString('\n')
+		
+		if err != nil {
+			log.Errorf("action: receive_message | result: fail | client_id: %v | error: %v",
+				c.config.ID,
+				err,
+			)
+			return
+		}
+
+		winners := strings.Split(msg, ",")
+
+		log.Infof("action: consulta_ganadores | result: success | cant_ganadores: %v",
+			len(winners),
+		)
+	}
+
 }
 
 func (c *Client) Close() {

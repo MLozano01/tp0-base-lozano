@@ -20,6 +20,12 @@ const (
 const(
 	BET = 1
 	CLOSED = 2
+	INFO = 3
+	DONE = 4
+	ACK = "ACK\n"
+	ERROR = "ERROR\n"
+	WINNER = "WINNERS\n"
+	NO_WINNER = "NO_WINNERS\n"
 )
 
 // Protocol 
@@ -79,8 +85,6 @@ func FinalizeBet(bets []byte, agency int8) []byte {
 
 	final_bets.Write(bets)
 
-	log.Infof("Finalize Bet: ", len(final_bets.Bytes()))
-
 	return final_bets.Bytes()
 }
 
@@ -122,17 +126,44 @@ func writeString(buf *bytes.Buffer, s string, code int) {
 	}
 }
 
-// func writeInt32(buf *bytes.Buffer, num int32, code int) {
-	
-// 	err := binary.Write(buf, binary.BigEndian, int32(code))
+func SendClientInfo(agency int8) []byte {
+	buf := new(bytes.Buffer)
 
-// 	if err != nil {
-// 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
-// 	}
+	err := binary.Write(buf, binary.BigEndian, int32(2))
 
-// 	err = binary.Write(buf, binary.BigEndian, num)
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
 
-// 	if err != nil {
-// 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
-// 	}
-// }
+	err = binary.Write(buf, binary.BigEndian, int8(INFO))
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
+	err = binary.Write(buf, binary.BigEndian, agency)
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
+	return buf.Bytes()
+}
+
+func SendClientDone() []byte {
+	buf := new(bytes.Buffer)
+
+	err := binary.Write(buf, binary.BigEndian, int32(1))
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
+	err = binary.Write(buf, binary.BigEndian, int8(DONE))
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
+	return buf.Bytes()
+}
