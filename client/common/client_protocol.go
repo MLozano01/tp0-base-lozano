@@ -54,7 +54,7 @@ func EncodeBet(bet Bet) []byte {
 func FinalizeBet(bets []byte, agency int32) []byte {
 	final_bets := new(bytes.Buffer)
 
-	err := binary.Write(final_bets, binary.BigEndian, int32(len(bets)))
+	err := binary.Write(final_bets, binary.BigEndian, int32(len(bets) + 4))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
@@ -68,7 +68,7 @@ func FinalizeBet(bets []byte, agency int32) []byte {
 
 	final_bets.Write(bets)
 
-	log.Infof("Finalize Bet: ", final_bets.Bytes())
+	log.Infof("Finalize Bet: ", len(final_bets.Bytes()))
 
 	return final_bets.Bytes()
 }
