@@ -61,7 +61,7 @@ class Server:
 
                 utils.store_bets(bets)
 
-                logging.info(f"action: apuesta_almacenada | result: success | cantidad: {len(bets)}")
+                logging.info(f"action: apuesta_recibida | result: success | cantidad: {len(bets)}")
 
                 client_sock.sendall("ACK\n".encode('utf-8'))
 
