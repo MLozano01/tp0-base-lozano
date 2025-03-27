@@ -92,7 +92,7 @@ def check_bet(bet):
     if not bet.birthdate:
         logging.error(f"action: check_bet | result: fail | error: birthdate")
         all_good = False
-    if bet.number <= 0:
+    if bet.number < 0:
         logging.error(f"action: check_bet | result: fail | error: number")
         all_good = False
     return all_good
