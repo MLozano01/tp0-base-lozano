@@ -104,6 +104,8 @@ class Server:
         expected_size_int = int.from_bytes(expected_size, byteorder='big')
         data = bytearray()
 
+        logging.info(f"action: receive_message | result: in_progress | expected_size: {expected_size_int}")
+
         while len(data) < expected_size_int:
             part = sock.recv(1024)
             data.extend(part)

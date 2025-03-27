@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
+
 )
 
 const (
@@ -66,6 +67,8 @@ func FinalizeBet(bets []byte, agency int32) []byte {
 	}
 
 	final_bets.Write(bets)
+
+	log.Infof("Finalize Bet: ", final_bets.Bytes())
 
 	return final_bets.Bytes()
 }
