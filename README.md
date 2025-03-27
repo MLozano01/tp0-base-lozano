@@ -4,6 +4,77 @@ En el presente repositorio se provee un esqueleto básico de cliente/servidor, e
 
  El cliente (Golang) y el servidor (Python) fueron desarrollados en diferentes lenguajes simplemente para mostrar cómo dos lenguajes de programación pueden convivir en el mismo proyecto con la ayuda de containers, en este caso utilizando [Docker Compose](https://docs.docker.com/compose/).
 
+
+## Solucion
+
+### Ej1
+
+Para generar el archivo `docker-compose-dev.yaml` se debe ejecutar el siguiente comando:
+
+    bash generar-compose.sh docker-compose-dev.yaml {cantidad de clientes}
+
+El script `generar-compose.sh` sigue el modelo de la consigna 
+
+```
+#!/bin/bash
+echo "Nombre del archivo de salida: $1"
+echo "Cantidad de clientes: $2"
+python3 mi-generador.py $1 $2
+```
+
+### Ej2
+
+En este ejercicio se incluye al script de python `mi-generador.py` el campo de `volumes` tanto en el cliente como en el servidor, para que monten los archicos de config en su respectivo contenedor.
+
+### Ej3
+
+Este ejercicio utiliza el comando `nc` de `netcat` para verificar que el server sea un echo-server y que este funcionando apropiadamente. Se decidio usar la imagen `busybox` ya que posee el comando netcat y no requiere que sea instalado. 
+
+#### Dificultades
+
+En un principio se intento utilizar la imagen de ubuntu, pero esta no posee netcat y requiere ser instalado.
+
+### Ej4
+
+En este ejercicio se utilizan las herramientas de Go y Python para poder procesar la signal SIGTERM. Se implemento de forma que al recibir la signal los procesos tengan una salida gracefull, cerrando todos los sockets.
+
+### Ej5
+
+#### Protocolo
+
+```
+ 0. Total length (int32)
+ 1. NAME_CODE (int32) | length (int32) | name (string)
+ 2. SURNAME_CODE (int32) | length (int32) | surname (string)
+ 3. ID_CODE (int32) | length (int32) | surname (string)
+ 4. BIRTHDATE_CODE (int32) | length (int32) | birthdate (string)
+ 5. NUMBER_CODE (int32) | number (int32)
+```
+
+Este es un primer protocolo que fue mejorado en los siguientes ejercicios. En esta altura y por simplicidad, el cliente espera luego del envio del msg un `ACK`
+
+### Ej6
+
+#### Protocolo
+
+Esta es una version mejorada del protocolo anterior, que acepta batch.
+
+```
+0. Total length (int32)
+0. Content (int8)
+0. Agency (int8)
+1. NAME_CODE (int8) | length (int16) | name (string)
+2. SURNAME_CODE (int8) | length (int16) | surname (string)
+3. ID_CODE (int8) | length (int16) | surname (string)
+4. BIRTHDATE_CODE (int8) | length (int16) | birthdate (string)
+5. NUMBER_CODE (int8) | length (int16) | number (string)
+6. End of Bet (int8)
+```
+
+
+### Ej7
+### Ej8
+
 ## Instrucciones de uso
 El repositorio cuenta con un **Makefile** que incluye distintos comandos en forma de targets. Los targets se ejecutan mediante la invocación de:  **make \<target\>**. Los target imprescindibles para iniciar y detener el sistema son **docker-compose-up** y **docker-compose-down**, siendo los restantes targets de utilidad para el proceso de depuración.
 
