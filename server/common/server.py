@@ -55,7 +55,8 @@ class Server:
                 self.all_process.append(process)
 
             except Exception as e:
-                logging.error(f"action: run | result: fail | error: {e}")
+                # logging.error("ES ACA")
+                # logging.error(f"action: run | result: fail | error: {e}")
                 break
 
     def __handle_client_connection(self, client_sock, lock, queue):
@@ -173,6 +174,10 @@ class Server:
     def end(self):
         for process in self.all_process:
             process.join()
+            logging.info(f"action: closing thread | result: success | pid: {process.pid}")
+
         for client in self.client_list:
             client.close()
+            logging.info(f"action: closing client | result: success")
+
         self.close_server_socket()
