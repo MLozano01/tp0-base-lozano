@@ -192,6 +192,10 @@ func (c *Client) getServerResponse() {
 		)
 	}
 
+	if msg == NO_WINNER {
+		log.Infof("action: consulta_ganadores | result: success | cant_ganadores: 0")
+	}
+
 }
 
 func (c *Client) Close() {

@@ -132,13 +132,20 @@ def decode_info(data):
     return info
 
 def encode_winners(winners):
+    
+    if len(winners) == 0:
+        return "NO_WINNERS\n"
+
     winners_msg = "WINNERS\n"
 
     for winner in winners:
         winners_msg += f"{winner},"
+
+    winners_msg = winners_msg[:-1]
 
     winners_msg += "\n"
 
     logging.info(f"action: encode_winners | result: success | winners: {winners_msg}")
 
     return winners_msg
+
