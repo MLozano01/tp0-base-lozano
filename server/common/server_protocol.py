@@ -135,9 +135,9 @@ def encode_winners(winners):
     winners_msg = "WINNERS\n"
 
     for winner in winners:
-        winners_msg.join(f"{winner.document}\n", ",")
+        winners_msg += f"{winner},"
 
-    winners_msg.join("\n")
+    winners_msg += "\n"
 
     logging.info(f"action: encode_winners | result: success | winners: {winners_msg}")
 
