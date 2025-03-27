@@ -15,7 +15,11 @@ const (
 	NUMBER_CODE = 5
 	END_BET = 6
 
-	CLOSED = "CLOSED\n"
+)
+
+const(
+	BET = 1
+	CLOSED = 2
 )
 
 // Protocol 
@@ -60,6 +64,12 @@ func FinalizeBet(bets []byte, agency int32) []byte {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
 	}
 
+	err =  binary.Write(final_bets, binary.BigEndian, int32(BET))
+
+	if err != nil {
+		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
+	}
+
 	err = binary.Write(final_bets, binary.BigEndian, agency)
 
 	if err != nil {
@@ -76,15 +86,7 @@ func FinalizeBet(bets []byte, agency int32) []byte {
 func WriteConnectionClosed() []byte {
 	buf := new(bytes.Buffer)
 
-
-
-	err := binary.Write(buf, binary.BigEndian, int32(len(CLOSED)))
-
-	if err != nil {
-		log.Criticalf("action: encode_bet | result: fail | error: %v", err)
-	}
-
-	_, err = buf.WriteString(CLOSED)
+	err := binary.Write(buf, binary.BigEndian, int32(CLOSED))
 
 	if err != nil {
 		log.Criticalf("action: encode_bet | result: fail | error: %v", err)

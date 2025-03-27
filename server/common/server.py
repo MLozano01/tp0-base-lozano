@@ -2,7 +2,7 @@ import socket
 import logging
 import signal
 
-from common.server_protocol import decode_bets
+from common.server_protocol import decode_bets, parse_data, CLOSED, INT32_LEN
 import common.utils as utils
 
 class Server:
@@ -43,16 +43,15 @@ class Server:
         If a problem arises in the communication with the client, the
         client socket will also be closed
         """
-        connection_opened = True
         try:            
-            while connection_opened:
+            while True:
                 data = self.rcvall(client_sock)
-                connection_opened = self._check_connection_status(data)
-                if not connection_opened:
+
+                action, bets, all_good = decode_bets(data)
+                
+                if action:
                     logging.info("action: receive_message | result: success | message: CLOSED")
                     break
-
-                bets, all_good = decode_bets(data)
 
                 if not all_good:
                     logging.error(f"action: receive_message | result: fail | cantidad: {len(bets)}")
@@ -100,7 +99,7 @@ class Server:
         self.close_server_socket()
 
     def rcvall(self, sock):
-        expected_size = sock.recv(4)
+        expected_size = sock.recv(INT32_LEN)
         expected_size_int = int.from_bytes(expected_size, byteorder='big')
         data = bytearray()
 
