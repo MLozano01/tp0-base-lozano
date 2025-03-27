@@ -9,6 +9,9 @@ BIRTHDATE_CODE = 4
 NUMBER_CODE = 5
 END_BET = 6
 
+BET = 1
+CLOSED = 2
+
 INT32_LEN = 4
 
 # Protocol 
@@ -19,12 +22,28 @@ INT32_LEN = 4
 # 4. BIRTHDATE_CODE (int32) | length (int32) | birthdate (string)
 # 5. NUMBER_CODE (int32) | number (int32)
 
+def parse_data(data):
+    total_bytes_rcv = 0
+    total_bytes_rcv += INT32_LEN
+
+    action = int.from_bytes(data[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
+    total_bytes_rcv += INT32_LEN
+
+    if action == BET:
+        logging.info(f"action: parse_data | result: success | message: BET")
+        bets, all_good = decode_bets(data[total_bytes_rcv:])
+        return action, bets, all_good
+    
+    elif action == CLOSED:
+        logging.info(f"action: parse_data | result: success | message: CLOSED")
+        return action, [], True
+
+    logging.error(f"action: parse_data | result: fail | error: action")
+
 def decode_bets(bet_info):
     total_bytes_rcv = 0
     bets = []
     all_good = True
-
-    total_bytes_rcv += INT32_LEN
 
     agency = int.from_bytes(bet_info[total_bytes_rcv:total_bytes_rcv+INT32_LEN], byteorder='big')
     total_bytes_rcv += INT32_LEN

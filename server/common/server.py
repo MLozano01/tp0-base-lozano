@@ -2,7 +2,7 @@ import socket
 import logging
 import signal
 
-from common.server_protocol import decode_bets, parse_data, CLOSED, INT32_LEN
+import common.server_protocol as protocol
 import common.utils as utils
 
 class Server:
@@ -46,10 +46,9 @@ class Server:
         try:            
             while True:
                 data = self.rcvall(client_sock)
-
-                action, bets, all_good = parse_data(data)
+                action, bets, all_good = protocol.parse_data(data)
                 
-                if action:
+                if action == protocol.CLOSED:
                     logging.info("action: receive_message | result: success | message: CLOSED")
                     break
 
@@ -65,7 +64,7 @@ class Server:
                 client_sock.sendall("ACK\n".encode('utf-8'))
 
         except OSError as e:
-            logging.error("action: receive_message | result: fail | error: {e}")
+            logging.error(f"action: receive_message | result: fail | error: {e}")
 
         finally:
             client_sock.close()
@@ -99,7 +98,7 @@ class Server:
         self.close_server_socket()
 
     def rcvall(self, sock):
-        expected_size = sock.recv(INT32_LEN)
+        expected_size = sock.recv(protocol.INT32_LEN)
         expected_size_int = int.from_bytes(expected_size, byteorder='big')
         data = bytearray()
 
