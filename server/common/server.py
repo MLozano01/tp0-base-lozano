@@ -93,7 +93,7 @@ class Server:
         """
         self._server_socket.shutdown(socket.SHUT_RDWR)
         self._server_socket.close()
-        logging.info("action: close_server_socket | result: success")
+        logging.info("action: exit | result: success")
         print("Server closed")
 
     def hanlder(self):
