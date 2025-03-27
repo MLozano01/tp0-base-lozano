@@ -2,6 +2,7 @@ package common
 
 import (
 	"bufio"
+	"errors"
 	"net"
 	"os"
 	"time"
@@ -66,12 +67,20 @@ func (c *Client) StartClientLoop() {
 	id, _ := strconv.Atoi(c.config.ID)
 
 	c.sendAll(SendClientInfo(int8(id)))
-	c.getServerResponse()
+	err := c.getServerResponse()
+
+	if err != nil {
+		log.Criticalf("action: get_server_response | result: fail | client_id: %v | error: %v", c.config.ID, err)
+		c.Close()
+		return
+	}
 
 	f, err := os.Open("./agency.csv")
 
 	if err != nil {
 		log.Criticalf("action: open_file | result: fail | client_id: %v | error: %v", c.config.ID, err)
+		c.Close()
+		return
 	}
 
 	defer f.Close()
@@ -105,7 +114,12 @@ func (c *Client) StartClientLoop() {
 
 		if batchNum == c.config.BatchMaxAmount {
 			c.sendAll(FinalizeBet(bets_raw, int8(id)))
-			c.getServerResponse()
+			err := c.getServerResponse()
+			if err != nil {
+				log.Criticalf("action: get_server_response | result: fail | client_id: %v | error: %v", c.config.ID, err)
+				c.Close()
+				return
+			}
 			batchNum = 0
 			bets_raw = []byte{}
 		}
@@ -115,7 +129,12 @@ func (c *Client) StartClientLoop() {
 
 	if len(bets_raw) > 0 {
 		c.sendAll(FinalizeBet(bets_raw, int8(id)))
-		c.getServerResponse()
+		err := c.getServerResponse()
+		if err != nil {
+			log.Criticalf("action: get_server_response | result: fail | client_id: %v | error: %v", c.config.ID, err)
+			c.Close()
+			return
+		}
 		time.Sleep(c.config.LoopPeriod)
 	}
 
@@ -125,7 +144,12 @@ func (c *Client) StartClientLoop() {
 
 	time.Sleep(time_to_wait)
 
-	c.getServerResponse()
+	err = c.getServerResponse()
+	if err != nil {
+		log.Criticalf("action: get_server_response | result: fail | client_id: %v | error: %v", c.config.ID, err)
+		c.Close()
+		return
+	}
 
 	time.Sleep(time_to_wait)
 
@@ -145,7 +169,7 @@ func (c *Client) sendAll(data []byte) {
 	}
 }
 
-func (c *Client) getServerResponse() {
+func (c *Client) getServerResponse() error {
 	reader := bufio.NewReader(c.conn)
 	msg, err := reader.ReadString('\n')
 
@@ -155,7 +179,7 @@ func (c *Client) getServerResponse() {
 			c.config.ID,
 			err,
 		)
-		return
+		return err
 	}
 
 	if msg == ERROR {
@@ -163,7 +187,7 @@ func (c *Client) getServerResponse() {
 			c.config.ID,
 			msg,
 		)
-		return
+		return errors.New("error message received")
 	}
 
 	if msg == WINNER {
@@ -174,7 +198,7 @@ func (c *Client) getServerResponse() {
 				c.config.ID,
 				err,
 			)
-			return
+			return err
 		}
 
 		winners := strings.Split(msg, ",")
@@ -186,8 +210,14 @@ func (c *Client) getServerResponse() {
 
 	if msg == NO_WINNER {
 		log.Infof("action: consulta_ganadores | result: success | cant_ganadores: 0")
+		return nil
 	}
 
+	if msg == ACK {
+		return nil
+	}
+
+	return nil
 }
 
 func (c *Client) Close() {
